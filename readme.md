@@ -18,6 +18,7 @@ This platform addresses all the critical failures identified in the original Car
 ## 🏗️ Architecture
 
 ### Microservices
+- **Frontend** (Port 5173) - React + Vite + Tailwind CSS
 - **API Gateway** (Port 3000) - Single entry point with rate limiting
 - **User Service** (Port 3001) - Authentication & user management
 - **Campaign Service** (Port 3002) - Campaign CRUD with read models
@@ -60,6 +61,7 @@ docker-compose ps
 ```
 
 4. **Access the services**
+- **Frontend Application**: http://localhost:5173
 - API Gateway: http://localhost:3000
 - Grafana Dashboard: http://localhost:3100 (admin/admin)
 - Prometheus: http://localhost:9090
@@ -157,15 +159,45 @@ npm test tests/stateMachine.test.js
 2. Login with admin/admin
 3. View pre-configured dashboards
 
-### Tracing (Jaeger)
+### Tracing (Jaeger + OpenTelemetry)
 1. Open http://localhost:16686
 2. Select service and view distributed traces
 3. Track requests across all microservices
+4. **See**: [Complete Tracing Guide](docs/TRACING_GUIDE.md)
+
+**End-to-End Trace Example:**
+- API Gateway → Pledge Service → Payment Service → Campaign Service
+- Full donation workflow visible with timing and dependencies
+- Custom business attributes (pledge ID, amount, campaign ID)
 
 ### Logs (ELK Stack)
 1. Open http://localhost:5601
 2. Create index pattern: `careforall-logs-*`
 3. View centralized logs from all services
+
+## 🧪 Stress Testing
+
+### Load Testing (1000+ RPS)
+```bash
+# Install k6
+winget install k6 --source winget
+
+# Run stress test
+k6 run tests/stress-test.js
+
+# Run failure scenarios
+k6 run tests/failure-scenarios.js
+```
+
+**Test Scenarios:**
+- ✅ 1000 concurrent users
+- ✅ 1000+ requests per second
+- ✅ Idempotency validation
+- ✅ Redis failure (Outbox pattern)
+- ✅ MongoDB slow queries (Read models)
+- ✅ Service timeout handling
+
+**See**: [Complete Stress Testing Guide](docs/STRESS_TESTING_GUIDE.md)
 
 ## 🔄 CI/CD Pipeline
 
@@ -211,6 +243,15 @@ Each service follows semantic versioning (v1.0.0) defined in package.json
 ```
 Microservice-Hackathon/
 ├── docs/                    # Architecture & API documentation
+├── frontend/                # React + Vite frontend application
+│   ├── src/
+│   │   ├── components/     # Reusable UI components
+│   │   ├── context/        # React Context (Auth)
+│   │   ├── pages/          # Page components
+│   │   ├── services/       # API client
+│   │   └── App.jsx
+│   ├── Dockerfile
+│   └── nginx.conf
 ├── services/                # All microservices
 │   ├── api-gateway/
 │   ├── user-service/
@@ -255,6 +296,8 @@ MIT License - See LICENSE file for details
 - [Architecture Documentation](docs/architecture.md)
 - [Data Models](docs/data-models.md)
 - [API Contracts](docs/api-contracts.md)
+- [OpenTelemetry Tracing Guide](docs/TRACING_GUIDE.md)
+- [Stress Testing Guide](docs/STRESS_TESTING_GUIDE.md)
 - [Implementation Status](IMPLEMENTATION_STATUS.md)
 
 ## 🐛 Troubleshooting

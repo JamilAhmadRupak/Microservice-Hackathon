@@ -23,13 +23,13 @@ const subscribeToEvents = async () => {
   const subscriber = redisClient.duplicate();
   await subscriber.connect();
 
-  // Subscribe to pledge created events
-  await subscriber.subscribe('pledge.created', async (message) => {
+  // Subscribe to pledge AUTHORIZED events (after admin approval)
+  await subscriber.subscribe('pledge.authorized', async (message) => {
     try {
       const event = JSON.parse(message);
-      logger.info('Received pledge.created event', { event });
+      logger.info('Received pledge.authorized event', { event });
 
-      // Process payment with idempotency key
+      // Process payment with idempotency key ONLY after admin approval
       await paymentService.processPayment(event.idempotencyKey, {
         pledgeId: event.pledgeId,
         campaignId: event.campaignId,
@@ -38,13 +38,13 @@ const subscribeToEvents = async () => {
         paymentIntentId: event.paymentIntentId
       });
       
-      logger.info('Payment processed successfully', { pledgeId: event.pledgeId });
+      logger.info('Payment processed successfully after admin approval', { pledgeId: event.pledgeId });
     } catch (error) {
-      logger.error('Error handling pledge.created event:', error);
+      logger.error('Error handling pledge.authorized event:', error);
     }
   });
 
-  logger.info('Subscribed to pledge.created events');
+  logger.info('Subscribed to pledge.authorized events');
 };
 
 module.exports = { subscribeToEvents, redisClient };

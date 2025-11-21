@@ -127,6 +127,9 @@ class PaymentService {
       // Then immediately mark as COMPLETED
       await this.updatePledgeState(transaction.pledgeId, 'COMPLETED');
 
+      // Publish pledge.completed event to update campaign totals
+      await this.publishPledgeCompletedEvent(transaction);
+
       this.logger.info('Payment captured and completed', { 
         transactionId: transaction._id,
         paymentIntentId 
@@ -139,6 +142,36 @@ class PaymentService {
     } catch (error) {
       this.logger.error('Capture payment error:', { error: error.message, paymentIntentId });
       throw error;
+    }
+  }
+
+  async publishPledgeCompletedEvent(transaction) {
+    try {
+      const redis = require('redis');
+      const redisClient = redis.createClient({ 
+        url: process.env.REDIS_URL || 'redis://localhost:6379' 
+      });
+      await redisClient.connect();
+      
+      const event = {
+        pledgeId: transaction.pledgeId.toString(),
+        campaignId: transaction.campaignId.toString(),
+        amount: transaction.amount,
+        currency: transaction.currency,
+        transactionId: transaction._id.toString()
+      };
+      
+      await redisClient.publish('pledge.completed', JSON.stringify(event));
+      await redisClient.quit();
+      
+      this.logger.info('Published pledge.completed event', { 
+        pledgeId: transaction.pledgeId,
+        campaignId: transaction.campaignId,
+        amount: transaction.amount 
+      });
+    } catch (error) {
+      this.logger.error('Failed to publish pledge.completed event:', { error: error.message });
+      // Don't throw - transaction is already captured
     }
   }
 

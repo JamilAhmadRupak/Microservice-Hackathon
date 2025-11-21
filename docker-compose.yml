@@ -46,8 +46,11 @@ services:
       MONGO_URI: mongodb+srv://monkeiydluffy752:hdx2lkDWkNhNOggC@cluster0.jtvkt.mongodb.net/careforall?retryWrites=true&w=majority
       JWT_SECRET: careforall-secret-key-2025
       NODE_ENV: production
+      JAEGER_HOST: jaeger
+      JAEGER_PORT: 14268
     depends_on:
       - redis
+      - jaeger
     networks:
       - careforall-network
     restart: unless-stopped
@@ -65,9 +68,13 @@ services:
       REDIS_URL: redis://redis:6379
       JWT_SECRET: careforall-secret-key-2025
       NODE_ENV: production
+      JAEGER_HOST: jaeger
+      JAEGER_PORT: 14268
     depends_on:
       redis:
         condition: service_healthy
+      jaeger:
+        condition: service_started
     networks:
       - careforall-network
     restart: unless-stopped
@@ -89,9 +96,13 @@ services:
       JWT_SECRET: careforall-secret-key-2025
       PAYMENT_SERVICE_URL: http://payment-service:3004
       NODE_ENV: production
+      JAEGER_HOST: jaeger
+      JAEGER_PORT: 14268
     depends_on:
       redis:
         condition: service_healthy
+      jaeger:
+        condition: service_started
     networks:
       - careforall-network
     restart: unless-stopped
@@ -111,9 +122,13 @@ services:
       PLEDGE_SERVICE_URL: http://pledge-service:3003
       WEBHOOK_SECRET: webhook-secret-2025
       NODE_ENV: production
+      JAEGER_HOST: jaeger
+      JAEGER_PORT: 14268
     depends_on:
       redis:
         condition: service_healthy
+      jaeger:
+        condition: service_started
     networks:
       - careforall-network
     restart: unless-stopped
@@ -131,6 +146,8 @@ services:
       MONGO_URI: mongodb+srv://monkeiydluffy752:hdx2lkDWkNhNOggC@cluster0.jtvkt.mongodb.net/careforall?retryWrites=true&w=majority
       REDIS_URL: redis://redis:6379
       NODE_ENV: production
+      JAEGER_HOST: jaeger
+      JAEGER_PORT: 14268
     depends_on:
       redis:
         condition: service_healthy
@@ -151,6 +168,10 @@ services:
       MONGO_URI: mongodb+srv://monkeiydluffy752:hdx2lkDWkNhNOggC@cluster0.jtvkt.mongodb.net/careforall?retryWrites=true&w=majority
       JWT_SECRET: careforall-secret-key-2025
       NODE_ENV: production
+      JAEGER_HOST: jaeger
+      JAEGER_PORT: 14268
+    depends_on:
+      - jaeger
     networks:
       - careforall-network
     restart: unless-stopped
@@ -172,6 +193,8 @@ services:
       NOTIFICATION_SERVICE_URL: http://notification-service:3005
       ADMIN_SERVICE_URL: http://admin-service:3006
       NODE_ENV: production
+      JAEGER_HOST: jaeger
+      JAEGER_PORT: 14268
     depends_on:
       - user-service
       - campaign-service
@@ -179,6 +202,23 @@ services:
       - payment-service
       - notification-service
       - admin-service
+      - jaeger
+    networks:
+      - careforall-network
+    restart: unless-stopped
+
+  # Frontend
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: careforall-frontend
+    ports:
+      - "5173:80"
+    environment:
+      - VITE_API_URL=http://localhost:3000
+    depends_on:
+      - api-gateway
     networks:
       - careforall-network
     restart: unless-stopped

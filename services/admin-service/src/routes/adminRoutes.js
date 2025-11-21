@@ -63,6 +63,49 @@ router.get('/transactions', async (req, res, next) => {
   }
 });
 
+// GET /api/admin/pledges
+router.get('/pledges', async (req, res, next) => {
+  try {
+    const filters = {
+      state: req.query.state,
+      page: req.query.page,
+      limit: req.query.limit
+    };
+    const result = await adminService.getAllPledges(filters);
+    sendSuccess(res, result, 200, req.correlationId);
+  } catch (error) {
+    next(error);
+  }
+});
+
+// PUT /api/admin/pledges/:id/approve
+router.put('/pledges/:id/approve', async (req, res, next) => {
+  try {
+    const result = await adminService.approvePledge(
+      req.params.id,
+      req.user.userId
+    );
+    sendSuccess(res, result, 200, req.correlationId);
+  } catch (error) {
+    next(error);
+  }
+});
+
+// PUT /api/admin/pledges/:id/reject
+router.put('/pledges/:id/reject', async (req, res, next) => {
+  try {
+    const { reason } = req.body;
+    const result = await adminService.rejectPledge(
+      req.params.id,
+      req.user.userId,
+      reason
+    );
+    sendSuccess(res, result, 200, req.correlationId);
+  } catch (error) {
+    next(error);
+  }
+});
+
 // Health check
 router.get('/health', (req, res) => {
   sendSuccess(res, { status: 'healthy', service: 'admin-service' }, 200);
