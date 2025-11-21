@@ -1,0 +1,21 @@
+{
+  "name": "@careforall/shared",
+  "version": "1.0.0",
+  "description": "Shared utilities for CareForAll microservices",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"No tests yet\" && exit 0"
+  },
+  "dependencies": {
+    "winston": "^3.11.0",
+    "uuid": "^9.0.1",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.0.3"
+  },
+  "keywords": [
+    "microservices",
+    "utilities"
+  ],
+  "author": "Api Avengers",
+  "license": "MIT"
+}
