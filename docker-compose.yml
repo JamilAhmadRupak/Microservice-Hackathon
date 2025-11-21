@@ -1,0 +1,309 @@
+version: '3.8'
+
+services:
+  # MongoDB Database
+  mongodb:
+    image: mongo:7.0
+    container_name: careforall-mongodb
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_DATABASE: careforall
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - careforall-network
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/careforall --quiet
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis for caching and event bus
+  redis:
+    image: redis:7-alpine
+    container_name: careforall-redis
+    ports:
+      - "6379:6379"
+    networks:
+      - careforall-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  # User Service
+  user-service:
+    build:
+      context: .
+      dockerfile: services/user-service/Dockerfile
+    container_name: user-service
+    ports:
+      - "3001:3001"
+    environment:
+      PORT: 3001
+      MONGO_URI: mongodb://mongodb:27017/careforall
+      JWT_SECRET: careforall-secret-key-2025
+      NODE_ENV: production
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    networks:
+      - careforall-network
+    restart: unless-stopped
+
+  # Campaign Service (with replicas for scalability)
+  campaign-service:
+    build:
+      context: .
+      dockerfile: services/campaign-service/Dockerfile
+    ports:
+      - "3002-3003:3002"
+    environment:
+      PORT: 3002
+      MONGO_URI: mongodb://mongodb:27017/careforall
+      REDIS_URL: redis://redis:6379
+      JWT_SECRET: careforall-secret-key-2025
+      NODE_ENV: production
+    depends_on:
+      mongodb:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - careforall-network
+    restart: unless-stopped
+    deploy:
+      replicas: 2
+
+  # Pledge Service
+  pledge-service:
+    build:
+      context: .
+      dockerfile: services/pledge-service/Dockerfile
+    container_name: pledge-service
+    ports:
+      - "3004:3003"
+    environment:
+      PORT: 3003
+      MONGO_URI: mongodb://mongodb:27017/careforall
+      REDIS_URL: redis://redis:6379
+      JWT_SECRET: careforall-secret-key-2025
+      PAYMENT_SERVICE_URL: http://payment-service:3004
+      NODE_ENV: production
+    depends_on:
+      mongodb:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - careforall-network
+    restart: unless-stopped
+
+  # Payment Service
+  payment-service:
+    build:
+      context: .
+      dockerfile: services/payment-service/Dockerfile
+    container_name: payment-service
+    ports:
+      - "3005:3004"
+    environment:
+      PORT: 3004
+      MONGO_URI: mongodb://mongodb:27017/careforall
+      REDIS_URL: redis://redis:6379
+      PLEDGE_SERVICE_URL: http://pledge-service:3003
+      WEBHOOK_SECRET: webhook-secret-2025
+      NODE_ENV: production
+    depends_on:
+      mongodb:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - careforall-network
+    restart: unless-stopped
+
+  # Notification Service
+  notification-service:
+    build:
+      context: .
+      dockerfile: services/notification-service/Dockerfile
+    container_name: notification-service
+    ports:
+      - "3006:3005"
+    environment:
+      PORT: 3005
+      MONGO_URI: mongodb://mongodb:27017/careforall
+      REDIS_URL: redis://redis:6379
+      NODE_ENV: production
+    depends_on:
+      mongodb:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - careforall-network
+    restart: unless-stopped
+
+  # Admin Service
+  admin-service:
+    build:
+      context: .
+      dockerfile: services/admin-service/Dockerfile
+    container_name: admin-service
+    ports:
+      - "3007:3006"
+    environment:
+      PORT: 3006
+      MONGO_URI: mongodb://mongodb:27017/careforall
+      JWT_SECRET: careforall-secret-key-2025
+      NODE_ENV: production
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    networks:
+      - careforall-network
+    restart: unless-stopped
+
+  # API Gateway
+  api-gateway:
+    build:
+      context: .
+      dockerfile: services/api-gateway/Dockerfile
+    container_name: api-gateway
+    ports:
+      - "3000:3000"
+    environment:
+      PORT: 3000
+      USER_SERVICE_URL: http://user-service:3001
+      CAMPAIGN_SERVICE_URL: http://campaign-service:3002
+      PLEDGE_SERVICE_URL: http://pledge-service:3003
+      PAYMENT_SERVICE_URL: http://payment-service:3004
+      NOTIFICATION_SERVICE_URL: http://notification-service:3005
+      ADMIN_SERVICE_URL: http://admin-service:3006
+      NODE_ENV: production
+    depends_on:
+      - user-service
+      - campaign-service
+      - pledge-service
+      - payment-service
+      - notification-service
+      - admin-service
+    networks:
+      - careforall-network
+    restart: unless-stopped
+
+  # Prometheus for metrics
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./infrastructure/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+    networks:
+      - careforall-network
+    restart: unless-stopped
+
+  # Grafana for visualization
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    ports:
+      - "3100:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_USERS_ALLOW_SIGN_UP=false
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./infrastructure/grafana/dashboards:/etc/grafana/provisioning/dashboards
+      - ./infrastructure/grafana/datasources:/etc/grafana/provisioning/datasources
+    depends_on:
+      - prometheus
+    networks:
+      - careforall-network
+    restart: unless-stopped
+
+  # Jaeger for distributed tracing
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    container_name: jaeger
+    ports:
+      - "5775:5775/udp"
+      - "6831:6831/udp"
+      - "6832:6832/udp"
+      - "5778:5778"
+      - "16686:16686"
+      - "14268:14268"
+      - "14250:14250"
+      - "9411:9411"
+    environment:
+      - COLLECTOR_ZIPKIN_HOST_PORT=:9411
+    networks:
+      - careforall-network
+    restart: unless-stopped
+
+  # Elasticsearch for logs
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.11.0
+    container_name: elasticsearch
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    volumes:
+      - elasticsearch_data:/usr/share/elasticsearch/data
+    networks:
+      - careforall-network
+    restart: unless-stopped
+
+  # Kibana for log visualization
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.11.0
+    container_name: kibana
+    ports:
+      - "5601:5601"
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+    depends_on:
+      - elasticsearch
+    networks:
+      - careforall-network
+    restart: unless-stopped
+
+  # Logstash for log processing
+  logstash:
+    image: docker.elastic.co/logstash/logstash:8.11.0
+    container_name: logstash
+    ports:
+      - "5000:5000/tcp"
+      - "5000:5000/udp"
+      - "9600:9600"
+    volumes:
+      - ./infrastructure/logstash/pipeline:/usr/share/logstash/pipeline
+    environment:
+      - "LS_JAVA_OPTS=-Xmx256m -Xms256m"
+    depends_on:
+      - elasticsearch
+    networks:
+      - careforall-network
+    restart: unless-stopped
+
+networks:
+  careforall-network:
+    driver: bridge
+
+volumes:
+  mongodb_data:
+  prometheus_data:
+  grafana_data:
+  elasticsearch_data:
