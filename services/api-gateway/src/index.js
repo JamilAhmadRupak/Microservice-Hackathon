@@ -51,6 +51,8 @@ const services = {
 const proxyOptions = (target) => ({
   target,
   changeOrigin: true,
+  timeout: 30000, // 30 seconds
+  proxyTimeout: 30000,
   onProxyReq: (proxyReq, req) => {
     // Forward correlation ID
     if (req.correlationId) {

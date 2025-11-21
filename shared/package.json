@@ -9,7 +9,9 @@
   "dependencies": {
     "winston": "^3.11.0",
     "uuid": "^9.0.1",
-    "jsonwebtoken": "^9.0.2",
+    "jsonwebtoken": "^9.0.2"
+  },
+  "peerDependencies": {
     "mongoose": "^8.0.3"
   },
   "keywords": [

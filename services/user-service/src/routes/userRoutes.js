@@ -51,7 +51,13 @@ router.put('/profile', authMiddleware, async (req, res, next) => {
 
 // Health check
 router.get('/health', (req, res) => {
-  sendSuccess(res, { status: 'healthy', service: 'user-service' }, 200);
+  const mongoose = require('mongoose');
+  sendSuccess(res, { 
+    status: 'healthy', 
+    service: 'user-service',
+    dbState: mongoose.connection.readyState,
+    dbStates: '0=disconnected, 1=connected, 2=connecting, 3=disconnecting'
+  }, 200);
 });
 
 module.exports = router;

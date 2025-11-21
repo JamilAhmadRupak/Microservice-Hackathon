@@ -1,4 +1,5 @@
-const mongoose = require('mongoose');
+// Use the shared mongoose instance to ensure same connection
+const { mongoose } = require('../../shared/utils/database');
 const bcrypt = require('bcryptjs');
 
 const userSchema = new mongoose.Schema({
@@ -50,14 +51,14 @@ userSchema.index({ email: 1 });
 userSchema.index({ createdAt: -1 });
 
 // Hash password before saving
-userSchema.pre('save', async function(next) {
+userSchema.pre('save', function(next) {
   if (!this.isModified('password')) {
     return next();
   }
   
   try {
-    const salt = await bcrypt.genSalt(10);
-    this.password = await bcrypt.hash(this.password, salt);
+    // Use synchronous hashing with 6 rounds for better Docker performance
+    this.password = bcrypt.hashSync(this.password, 6);
     next();
   } catch (error) {
     next(error);

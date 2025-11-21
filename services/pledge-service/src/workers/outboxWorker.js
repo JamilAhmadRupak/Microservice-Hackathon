@@ -1,9 +1,11 @@
 const Outbox = require('../models/Outbox');
 const redis = require('redis');
+const mongoose = require('mongoose');
 const { createServiceLogger } = require('../../shared/utils/logger');
 
 const logger = createServiceLogger('outbox-worker');
 let redisClient;
+let isProcessing = false;
 
 const connectRedis = async () => {
   const redisUrl = process.env.REDIS_URL || 'redis://localhost:6379';
@@ -27,6 +29,13 @@ const publishEvent = async (event) => {
 };
 
 const processOutbox = async () => {
+  // Skip if already processing or MongoDB not connected
+  if (isProcessing || mongoose.connection.readyState !== 1) {
+    return;
+  }
+
+  isProcessing = true;
+  
   try {
     // Find pending events
     const pendingEvents = await Outbox.find({
@@ -37,6 +46,7 @@ const processOutbox = async () => {
       .limit(10);
 
     if (pendingEvents.length === 0) {
+      isProcessing = false;
       return;
     }
 
@@ -76,18 +86,30 @@ const processOutbox = async () => {
     }
   } catch (error) {
     logger.error('Outbox processing error:', error);
+  } finally {
+    isProcessing = false;
   }
 };
 
 const startOutboxWorker = async () => {
   await connectRedis();
   
-  // Process outbox every 2 seconds
-  setInterval(async () => {
-    await processOutbox();
-  }, 2000);
+  logger.info('Waiting for MongoDB connection before starting outbox worker...');
   
-  logger.info('Outbox worker started');
+  // Wait for MongoDB to be ready
+  const waitForMongo = setInterval(() => {
+    if (mongoose.connection.readyState === 1) {
+      clearInterval(waitForMongo);
+      logger.info('MongoDB connected, starting outbox worker');
+      
+      // Process outbox every 2 seconds
+      setInterval(async () => {
+        await processOutbox();
+      }, 2000);
+    }
+  }, 1000);
+  
+  logger.info('Outbox worker initialized');
 };
 
 module.exports = { startOutboxWorker, redisClient };
