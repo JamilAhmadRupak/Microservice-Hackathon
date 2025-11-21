@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+const { mongoose } = require('../../shared/utils/database');
 
 const campaignSchema = new mongoose.Schema({
   title: {

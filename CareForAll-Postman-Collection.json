@@ -86,7 +86,7 @@
         ],
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"title\": \"Help Build School in Rural Area\",\n  \"description\": \"We are raising funds to build a school for underprivileged children in rural Bangladesh\",\n  \"goal\": 50000,\n  \"category\": \"education\",\n  \"endDate\": \"2025-12-31\",\n  \"images\": [\"https://example.com/school.jpg\"]\n}"
+          "raw": "{\n  \"title\": \"Help Build School in Rural Area\",\n  \"description\": \"We are raising funds to build a school for underprivileged children in rural Bangladesh\",\n  \"story\": \"This is a detailed story about the need for this school and how it will impact the community\",\n  \"goalAmount\": 50000,\n  \"currency\": \"BDT\",\n  \"category\": \"education\",\n  \"startDate\": \"2025-11-21\",\n  \"endDate\": \"2025-12-31\",\n  \"beneficiaryName\": \"Rural Community School\",\n  \"beneficiaryRelation\": \"Community Organization\",\n  \"imageUrl\": \"https://example.com/school.jpg\",\n  \"status\": \"active\"\n}"
         },
         "url": {
           "raw": "http://localhost:3000/api/campaigns",
@@ -141,7 +141,7 @@
         ],
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"campaignId\": \"CAMPAIGN_ID_HERE\",\n  \"amount\": 1000,\n  \"isAnonymous\": false\n}"
+          "raw": "{\n  \"campaignId\": \"CAMPAIGN_ID_HERE\",\n  \"amount\": 1000,\n  \"currency\": \"BDT\",\n  \"message\": \"Best wishes for the project!\"\n}"
         },
         "url": {
           "raw": "http://localhost:3000/api/pledges",
@@ -163,16 +163,35 @@
           }
         ],
         "url": {
-          "raw": "http://localhost:3000/api/pledges/my-pledges",
+          "raw": "http://localhost:3000/api/pledges/user/donations",
           "protocol": "http",
           "host": ["localhost"],
           "port": "3000",
-          "path": ["api", "pledges", "my-pledges"]
+          "path": ["api", "pledges", "user", "donations"]
         }
       }
     },
     {
-      "name": "9. Process Payment",
+      "name": "9. Get Transaction by Pledge ID",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer YOUR_TOKEN_HERE"
+          }
+        ],
+        "url": {
+          "raw": "http://localhost:3000/api/payments/transaction/PLEDGE_ID_HERE",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3000",
+          "path": ["api", "payments", "transaction", "PLEDGE_ID_HERE"]
+        }
+      }
+    },
+    {
+      "name": "10. Capture Payment (Admin)",
       "request": {
         "method": "POST",
         "header": [
@@ -187,19 +206,19 @@
         ],
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"pledgeId\": \"PLEDGE_ID_HERE\",\n  \"paymentMethod\": \"card\",\n  \"paymentDetails\": {\n    \"cardNumber\": \"4111111111111111\",\n    \"expiryMonth\": \"12\",\n    \"expiryYear\": \"2026\",\n    \"cvv\": \"123\"\n  }\n}"
+          "raw": "{}"
         },
         "url": {
-          "raw": "http://localhost:3000/api/payments/process",
+          "raw": "http://localhost:3000/api/payments/capture/PAYMENT_INTENT_ID_HERE",
           "protocol": "http",
           "host": ["localhost"],
           "port": "3000",
-          "path": ["api", "payments", "process"]
+          "path": ["api", "payments", "capture", "PAYMENT_INTENT_ID_HERE"]
         }
       }
     },
     {
-      "name": "10. Get Payment Status",
+      "name": "11. Get Payment Checkout",
       "request": {
         "method": "GET",
         "header": [
@@ -209,16 +228,16 @@
           }
         ],
         "url": {
-          "raw": "http://localhost:3000/api/payments/PAYMENT_ID_HERE",
+          "raw": "http://localhost:3000/api/payments/checkout/PAYMENT_INTENT_ID_HERE",
           "protocol": "http",
           "host": ["localhost"],
           "port": "3000",
-          "path": ["api", "payments", "PAYMENT_ID_HERE"]
+          "path": ["api", "payments", "checkout", "PAYMENT_INTENT_ID_HERE"]
         }
       }
     },
     {
-      "name": "11. API Gateway Health",
+      "name": "12. API Gateway Health",
       "request": {
         "method": "GET",
         "header": [],

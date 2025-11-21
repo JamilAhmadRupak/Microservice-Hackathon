@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+const { mongoose } = require('../../shared/utils/database');
 
 const PLEDGE_STATES = {
   PENDING: 'PENDING',

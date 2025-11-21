@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+const { mongoose } = require('../../shared/utils/database');
 
 // Read model for campaign totals - optimized for queries
 const campaignTotalsSchema = new mongoose.Schema({
