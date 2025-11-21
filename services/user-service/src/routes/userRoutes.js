@@ -51,13 +51,18 @@ router.put('/profile', authMiddleware, async (req, res, next) => {
 
 // Health check
 router.get('/health', (req, res) => {
-  const mongoose = require('mongoose');
+  const { mongoose } = require('../../shared/utils/database');
   sendSuccess(res, { 
     status: 'healthy', 
     service: 'user-service',
     dbState: mongoose.connection.readyState,
     dbStates: '0=disconnected, 1=connected, 2=connecting, 3=disconnecting'
   }, 200);
+});
+
+// Simple test endpoint without database
+router.post('/test', async (req, res) => {
+  sendSuccess(res, { message: 'Test successful', received: req.body }, 200, req.correlationId);
 });
 
 module.exports = router;

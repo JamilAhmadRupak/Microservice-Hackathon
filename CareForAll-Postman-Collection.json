@@ -1,0 +1,249 @@
+{
+  "info": {
+    "name": "CareForAll Donation Platform",
+    "description": "Complete API collection for testing the CareForAll microservices platform",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1. User Registration",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"donor@example.com\",\n  \"password\": \"SecurePass123\",\n  \"name\": \"John Donor\"\n}"
+        },
+        "url": {
+          "raw": "http://localhost:3000/api/users/register",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3000",
+          "path": ["api", "users", "register"]
+        }
+      }
+    },
+    {
+      "name": "2. User Login",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"donor@example.com\",\n  \"password\": \"SecurePass123\"\n}"
+        },
+        "url": {
+          "raw": "http://localhost:3000/api/users/login",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3000",
+          "path": ["api", "users", "login"]
+        }
+      }
+    },
+    {
+      "name": "3. Get User Profile",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer YOUR_TOKEN_HERE"
+          }
+        ],
+        "url": {
+          "raw": "http://localhost:3000/api/users/profile",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3000",
+          "path": ["api", "users", "profile"]
+        }
+      }
+    },
+    {
+      "name": "4. Create Campaign",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer YOUR_TOKEN_HERE"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"Help Build School in Rural Area\",\n  \"description\": \"We are raising funds to build a school for underprivileged children in rural Bangladesh\",\n  \"goal\": 50000,\n  \"category\": \"education\",\n  \"endDate\": \"2025-12-31\",\n  \"images\": [\"https://example.com/school.jpg\"]\n}"
+        },
+        "url": {
+          "raw": "http://localhost:3000/api/campaigns",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3000",
+          "path": ["api", "campaigns"]
+        }
+      }
+    },
+    {
+      "name": "5. Get All Campaigns",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:3000/api/campaigns",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3000",
+          "path": ["api", "campaigns"]
+        }
+      }
+    },
+    {
+      "name": "6. Get Campaign by ID",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:3000/api/campaigns/CAMPAIGN_ID_HERE",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3000",
+          "path": ["api", "campaigns", "CAMPAIGN_ID_HERE"]
+        }
+      }
+    },
+    {
+      "name": "7. Create Pledge",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer YOUR_TOKEN_HERE"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"campaignId\": \"CAMPAIGN_ID_HERE\",\n  \"amount\": 1000,\n  \"isAnonymous\": false\n}"
+        },
+        "url": {
+          "raw": "http://localhost:3000/api/pledges",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3000",
+          "path": ["api", "pledges"]
+        }
+      }
+    },
+    {
+      "name": "8. Get User's Pledges",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer YOUR_TOKEN_HERE"
+          }
+        ],
+        "url": {
+          "raw": "http://localhost:3000/api/pledges/my-pledges",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3000",
+          "path": ["api", "pledges", "my-pledges"]
+        }
+      }
+    },
+    {
+      "name": "9. Process Payment",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer YOUR_TOKEN_HERE"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"pledgeId\": \"PLEDGE_ID_HERE\",\n  \"paymentMethod\": \"card\",\n  \"paymentDetails\": {\n    \"cardNumber\": \"4111111111111111\",\n    \"expiryMonth\": \"12\",\n    \"expiryYear\": \"2026\",\n    \"cvv\": \"123\"\n  }\n}"
+        },
+        "url": {
+          "raw": "http://localhost:3000/api/payments/process",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3000",
+          "path": ["api", "payments", "process"]
+        }
+      }
+    },
+    {
+      "name": "10. Get Payment Status",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer YOUR_TOKEN_HERE"
+          }
+        ],
+        "url": {
+          "raw": "http://localhost:3000/api/payments/PAYMENT_ID_HERE",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3000",
+          "path": ["api", "payments", "PAYMENT_ID_HERE"]
+        }
+      }
+    },
+    {
+      "name": "11. API Gateway Health",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:3000/health",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3000",
+          "path": ["health"]
+        }
+      }
+    },
+    {
+      "name": "12. User Service Health",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:3001/api/users/health",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3001",
+          "path": ["api", "users", "health"]
+        }
+      }
+    }
+  ]
+}

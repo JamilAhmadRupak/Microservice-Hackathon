@@ -49,10 +49,15 @@ const startServer = async () => {
     const mongoUri = process.env.MONGO_URI || 'mongodb://localhost:27017/careforall';
     await connectDB(mongoUri, logger);
     
-    app.listen(PORT, () => {
+    const server = app.listen(PORT, () => {
       logger.info(`User Service running on port ${PORT}`);
       logger.info(`Environment: ${process.env.NODE_ENV || 'development'}`);
     });
+    
+    // Set server timeout to 60 seconds
+    server.timeout = 60000;
+    server.keepAliveTimeout = 65000;
+    server.headersTimeout = 66000;
   } catch (error) {
     logger.error('Failed to start server:', error);
     process.exit(1);

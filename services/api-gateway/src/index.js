@@ -14,7 +14,6 @@ const logger = createServiceLogger('api-gateway');
 // Security middleware
 app.use(helmet());
 app.use(cors());
-app.use(express.json());
 app.use(correlationIdMiddleware);
 
 // Rate limiting
