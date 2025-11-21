@@ -2,10 +2,10 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
-const { connectDB } = require('../../shared/utils/database');
-const { createServiceLogger } = require('../../shared/utils/logger');
-const { correlationIdMiddleware } = require('../../shared/middleware/correlationId');
-const { errorHandler } = require('../../shared/middleware/errorHandler');
+const { connectDB } = require('../shared/utils/database');
+const { createServiceLogger } = require('../shared/utils/logger');
+const { correlationIdMiddleware } = require('../shared/middleware/correlationId');
+const { errorHandler } = require('../shared/middleware/errorHandler');
 const campaignRoutes = require('./routes/campaignRoutes');
 const { subscribeToEvents } = require('./events/eventHandler');
 

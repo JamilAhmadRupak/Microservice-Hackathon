@@ -4,6 +4,7 @@ WORKDIR /app
 
 # Copy shared utilities first
 COPY shared/ /app/shared/
+RUN cd /app/shared && npm install --production
 
 # Copy service files
 COPY services/user-service/package*.json ./

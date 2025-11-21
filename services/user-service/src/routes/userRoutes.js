@@ -1,8 +1,8 @@
 const express = require('express');
 const UserService = require('../services/userService');
-const { sendSuccess, sendError } = require('../../../shared/utils/response');
-const { authMiddleware } = require('../../../shared/middleware/auth');
-const { createServiceLogger } = require('../../../shared/utils/logger');
+const { sendSuccess, sendError } = require('../../shared/utils/response');
+const { authMiddleware } = require('../../shared/middleware/auth');
+const { createServiceLogger } = require('../../shared/utils/logger');
 
 const router = express.Router();
 const logger = createServiceLogger('user-service');

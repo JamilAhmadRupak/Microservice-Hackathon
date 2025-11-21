@@ -1,8 +1,8 @@
 const express = require('express');
 const PledgeService = require('../services/pledgeService');
-const { sendSuccess, sendError } = require('../../../shared/utils/response');
-const { authMiddleware, optionalAuthMiddleware } = require('../../../shared/middleware/auth');
-const { createServiceLogger } = require('../../../shared/utils/logger');
+const { sendSuccess, sendError } = require('../../shared/utils/response');
+const { authMiddleware, optionalAuthMiddleware } = require('../../shared/middleware/auth');
+const { createServiceLogger } = require('../../shared/utils/logger');
 const { v4: uuidv4 } = require('uuid');
 
 const router = express.Router();

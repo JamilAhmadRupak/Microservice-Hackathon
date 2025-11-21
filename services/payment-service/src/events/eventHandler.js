@@ -1,6 +1,6 @@
 const redis = require('redis');
 const PaymentService = require('../services/paymentService');
-const { createServiceLogger } = require('../../../shared/utils/logger');
+const { createServiceLogger } = require('../../shared/utils/logger');
 
 const logger = createServiceLogger('payment-event-handler');
 const paymentService = new PaymentService(logger);

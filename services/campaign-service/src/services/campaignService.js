@@ -1,7 +1,7 @@
 const Campaign = require('../models/Campaign');
 const CampaignTotals = require('../models/CampaignTotals');
-const { ValidationError, NotFoundError, ForbiddenError } = require('../../../shared/utils/errors');
-const { validateRequired, validateAmount, validateDateRange } = require('../../../shared/utils/validation');
+const { ValidationError, NotFoundError, ForbiddenError } = require('../../shared/utils/errors');
+const { validateRequired, validateAmount, validateDateRange } = require('../../shared/utils/validation');
 
 class CampaignService {
   constructor(logger) {

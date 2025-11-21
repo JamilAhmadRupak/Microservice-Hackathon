@@ -1,6 +1,6 @@
 const redis = require('redis');
 const NotificationService = require('../services/notificationService');
-const { createServiceLogger } = require('../../../shared/utils/logger');
+const { createServiceLogger } = require('../../shared/utils/logger');
 
 const logger = createServiceLogger('notification-event-handler');
 const notificationService = new NotificationService(logger);

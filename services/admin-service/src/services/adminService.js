@@ -1,18 +1,43 @@
 const mongoose = require('mongoose');
 
-// Import models from other services (shared database)
-const campaignSchema = require('../../campaign-service/src/models/Campaign');
-const { Pledge } = require('../../pledge-service/src/models/Pledge');
-const Transaction = require('../../payment-service/src/models/Transaction');
-const User = require('../../user-service/src/models/User');
+// Define schemas directly (shared database access)
+const campaignSchema = new mongoose.Schema({
+  title: String,
+  status: String,
+  isVerified: Boolean,
+  verifiedBy: mongoose.Schema.Types.ObjectId,
+  verifiedAt: Date,
+  createdAt: { type: Date, default: Date.now }
+}, { collection: 'campaigns', timestamps: true });
+
+const pledgeSchema = new mongoose.Schema({
+  campaignId: mongoose.Schema.Types.ObjectId,
+  amount: Number,
+  state: String,
+  createdAt: { type: Date, default: Date.now }
+}, { collection: 'pledges', timestamps: true });
+
+const transactionSchema = new mongoose.Schema({
+  pledgeId: mongoose.Schema.Types.ObjectId,
+  amount: Number,
+  status: String,
+  createdAt: { type: Date, default: Date.now }
+}, { collection: 'transactions', timestamps: true });
+
+const userSchema = new mongoose.Schema({
+  email: String,
+  name: String,
+  createdAt: { type: Date, default: Date.now }
+}, { collection: 'users', timestamps: true });
 
 class AdminService {
   constructor(logger) {
     this.logger = logger;
-    this.Campaign = mongoose.model('Campaign');
-    this.Pledge = mongoose.model('Pledge');
-    this.Transaction = mongoose.model('Transaction');
-    this.User = mongoose.model('User');
+    // Use existing models or create new ones
+    this.Campaign = mongoose.models.Campaign || mongoose.model('Campaign', campaignSchema);
+    this.Pledge = mongoose.models.Pledge || mongoose.model('Pledge', pledgeSchema);
+    this.Transaction = mongoose.models.Transaction || mongoose.model('Transaction', transactionSchema);
+    this.User = mongoose.models.User || mongoose.model('User', userSchema);
   }
 
   async getDashboardStats() {

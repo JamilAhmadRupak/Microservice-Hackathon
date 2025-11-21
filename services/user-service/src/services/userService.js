@@ -1,7 +1,7 @@
 const User = require('../models/User');
 const jwt = require('jsonwebtoken');
-const { ValidationError, UnauthorizedError, ConflictError } = require('../../../shared/utils/errors');
-const { validateRequired, validateEmail } = require('../../../shared/utils/validation');
+const { ValidationError, UnauthorizedError, ConflictError } = require('../../shared/utils/errors');
+const { validateRequired, validateEmail } = require('../../shared/utils/validation');
 
 class UserService {
   constructor(logger) {

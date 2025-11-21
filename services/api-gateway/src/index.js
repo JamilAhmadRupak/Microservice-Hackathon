@@ -4,8 +4,8 @@ const cors = require('cors');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const { createProxyMiddleware } = require('http-proxy-middleware');
-const { createServiceLogger } = require('../../shared/utils/logger');
-const { correlationIdMiddleware } = require('../../shared/middleware/correlationId');
+const { createServiceLogger } = require('../shared/utils/logger');
+const { correlationIdMiddleware } = require('../shared/middleware/correlationId');
 
 const app = express();
 const PORT = process.env.PORT || 3000;

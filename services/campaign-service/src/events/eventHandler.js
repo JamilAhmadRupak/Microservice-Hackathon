@@ -1,6 +1,6 @@
 const redis = require('redis');
 const CampaignService = require('../services/campaignService');
-const { createServiceLogger } = require('../../../shared/utils/logger');
+const { createServiceLogger } = require('../../shared/utils/logger');
 
 const logger = createServiceLogger('campaign-event-handler');
 const campaignService = new CampaignService(logger);

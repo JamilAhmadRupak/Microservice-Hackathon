@@ -1,7 +1,7 @@
 const express = require('express');
 const PaymentService = require('../services/paymentService');
-const { sendSuccess, sendError } = require('../../../shared/utils/response');
-const { createServiceLogger } = require('../../../shared/utils/logger');
+const { sendSuccess, sendError } = require('../../shared/utils/response');
+const { createServiceLogger } = require('../../shared/utils/logger');
 
 const router = express.Router();
 const logger = createServiceLogger('payment-service');

@@ -2,7 +2,7 @@ const Transaction = require('../models/Transaction');
 const axios = require('axios');
 const crypto = require('crypto');
 const { v4: uuidv4 } = require('uuid');
-const { ValidationError, NotFoundError, DuplicateRequestError, PaymentError } = require('../../../shared/utils/errors');
+const { ValidationError, NotFoundError, DuplicateRequestError, PaymentError } = require('../../shared/utils/errors');
 
 class PaymentService {
   constructor(logger) {

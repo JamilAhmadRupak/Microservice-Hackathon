@@ -2,8 +2,8 @@ const { Pledge, PLEDGE_STATES } = require('../models/Pledge');
 const Outbox = require('../models/Outbox');
 const axios = require('axios');
 const { v4: uuidv4 } = require('uuid');
-const { ValidationError, NotFoundError, DuplicateRequestError } = require('../../../shared/utils/errors');
-const { validateRequired, validateAmount, validateEmail } = require('../../../shared/utils/validation');
+const { ValidationError, NotFoundError, DuplicateRequestError } = require('../../shared/utils/errors');
+const { validateRequired, validateAmount, validateEmail } = require('../../shared/utils/validation');
 
 class PledgeService {
   constructor(logger) {

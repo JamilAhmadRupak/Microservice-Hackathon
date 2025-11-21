@@ -1,6 +1,6 @@
 const Outbox = require('../models/Outbox');
 const redis = require('redis');
-const { createServiceLogger } = require('../../../shared/utils/logger');
+const { createServiceLogger } = require('../../shared/utils/logger');
 
 const logger = createServiceLogger('outbox-worker');
 let redisClient;
